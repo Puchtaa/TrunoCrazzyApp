@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:trunocrazy/features/ranking/data/repositories/ranking_repository_impl.dart';
+import 'package:trunocrazy/features/ranking/domain/usecases/get_ranking_usecase.dart';
 
 import 'core/network/api_client.dart';
 import 'features/auth/data/repositories/auth_repository_impl.dart';
@@ -12,7 +14,6 @@ import 'features/auth/presentation/pages/login_page.dart';
 import 'features/catalog/data/repositories/card_catalog_repository_impl.dart';
 import 'features/catalog/domain/usecases/list_cards_usecase.dart';
 import 'features/home/presentation/home_page.dart';
-
 void main() => runApp(const TrunoCrazyApp());
 
 class TrunoCrazyApp extends StatefulWidget {
@@ -29,6 +30,7 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
   late final GetCurrentSessionUseCase _getSession;
   late final ClearSessionUseCase _clearSession;
   late final ListCardsUseCase _listCards;
+  late final GetRankingUseCase _getRanking;
 
   AuthSession? _session;
   bool _loading = true;
@@ -46,6 +48,7 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
     _getSession = GetCurrentSessionUseCase(_sessions);
     _clearSession = ClearSessionUseCase(_sessions);
     _listCards = ListCardsUseCase(CardCatalogRepositoryImpl(_api));
+    _getRanking = GetRankingUseCase(RankingRepositoryImpl(_api));
     _restore();
   }
 
@@ -83,6 +86,7 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
         session: _session!,
         onLogout: _logout,
         listCards: _listCards,
+        getRanking: _getRanking,
       );
     }
 

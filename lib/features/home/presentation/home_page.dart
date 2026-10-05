@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:trunocrazy/features/profile/presentation/controllers/profile_controller.dart';
+import 'package:trunocrazy/features/profile/presentation/pages/profile_page.dart';
+import 'package:trunocrazy/features/ranking/domain/usecases/get_ranking_usecase.dart';
 
 import '../../auth/domain/entities/auth_session.dart';
 import '../../catalog/domain/usecases/list_cards_usecase.dart';
@@ -15,11 +18,13 @@ class HomePage extends StatefulWidget {
     required this.session,
     required this.onLogout,
     required this.listCards,
+    required this.getRanking,
   });
 
   final AuthSession session;
   final VoidCallback onLogout;
   final ListCardsUseCase listCards;
+  final GetRankingUseCase getRanking;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -69,11 +74,14 @@ class _HomePageState extends State<HomePage> {
       selectedIcon: Icons.leaderboard,
       // TODO: builder: (_) => RankingPage(...)
     ),
-    const _DockTab(
+    _DockTab(
       label: 'Perfil',
       icon: Icons.person_outline,
       selectedIcon: Icons.person,
-      // TODO: builder: (_) => ProfilePage(...)
+      builder: (_) => ProfilePage(
+        controller: ProfileController(widget.getRanking, widget.session),
+        onLogout: () async => widget.onLogout(),
+      ),
     ),
   ];
 
