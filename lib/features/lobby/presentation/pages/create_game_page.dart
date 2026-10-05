@@ -16,7 +16,7 @@ class _CreateGamePageState extends State<CreateGamePage> {
   final _roundReward = TextEditingController(text: '10');
   final _emptyHandReward = TextEditingController(text: '5');
   final _trophyPrice = TextEditingController(text: '30');
-  int _maxPlayers = 4;
+  int _maxPlayers = 6;
   int _initialCards = 3;
 
   @override
