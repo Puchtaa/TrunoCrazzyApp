@@ -13,6 +13,16 @@ import 'features/auth/presentation/controllers/login_controller.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 import 'features/catalog/data/repositories/card_catalog_repository_impl.dart';
 import 'features/catalog/domain/usecases/list_cards_usecase.dart';
+import 'features/game/data/repositories/game_repository_impl.dart';
+import 'features/game/domain/usecases/access_game_usecase.dart';
+import 'features/game/domain/usecases/answer_puzzle_usecase.dart';
+import 'features/game/domain/usecases/buy_trophy_usecase.dart';
+import 'features/game/domain/usecases/cancel_game_usecase.dart';
+import 'features/game/domain/usecases/create_game_usecase.dart';
+import 'features/game/domain/usecases/get_game_state_usecase.dart';
+import 'features/game/domain/usecases/play_card_usecase.dart';
+import 'features/game/domain/usecases/ready_for_next_round_usecase.dart';
+import 'features/game/domain/usecases/start_game_usecase.dart';
 import 'features/home/presentation/home_page.dart';
 void main() => runApp(const TrunoCrazyApp());
 
@@ -31,6 +41,16 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
   late final ClearSessionUseCase _clearSession;
   late final ListCardsUseCase _listCards;
   late final GetRankingUseCase _getRanking;
+  late final GameRepositoryImpl _gameRepository;
+  late final CreateGameUseCase _createGame;
+  late final AccessGameUseCase _accessGame;
+  late final GetGameStateUseCase _getGameState;
+  late final StartGameUseCase _startGame;
+  late final PlayCardUseCase _playCard;
+  late final AnswerPuzzleUseCase _answerPuzzle;
+  late final BuyTrophyUseCase _buyTrophy;
+  late final ReadyForNextRoundUseCase _readyForNextRound;
+  late final CancelGameUseCase _cancelGame;
 
   AuthSession? _session;
   bool _loading = true;
@@ -49,6 +69,16 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
     _clearSession = ClearSessionUseCase(_sessions);
     _listCards = ListCardsUseCase(CardCatalogRepositoryImpl(_api));
     _getRanking = GetRankingUseCase(RankingRepositoryImpl(_api));
+    _gameRepository = GameRepositoryImpl(_api);
+    _createGame = CreateGameUseCase(_gameRepository);
+    _accessGame = AccessGameUseCase(_gameRepository);
+    _getGameState = GetGameStateUseCase(_gameRepository);
+    _startGame = StartGameUseCase(_gameRepository);
+    _playCard = PlayCardUseCase(_gameRepository);
+    _answerPuzzle = AnswerPuzzleUseCase(_gameRepository);
+    _buyTrophy = BuyTrophyUseCase(_gameRepository);
+    _readyForNextRound = ReadyForNextRoundUseCase(_gameRepository);
+    _cancelGame = CancelGameUseCase(_gameRepository);
     _restore();
   }
 
@@ -87,6 +117,15 @@ class _TrunoCrazyAppState extends State<TrunoCrazyApp> {
         onLogout: _logout,
         listCards: _listCards,
         getRanking: _getRanking,
+        createGame: _createGame,
+        accessGame: _accessGame,
+        getGameState: _getGameState,
+        startGame: _startGame,
+        playCard: _playCard,
+        answerPuzzle: _answerPuzzle,
+        buyTrophy: _buyTrophy,
+        ready: _readyForNextRound,
+        cancelGame: _cancelGame,
       );
     }
 

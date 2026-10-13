@@ -6,6 +6,19 @@ import 'package:trunocrazy/features/ranking/domain/usecases/get_ranking_usecase.
 import '../../auth/domain/entities/auth_session.dart';
 import '../../catalog/domain/usecases/list_cards_usecase.dart';
 import '../../catalog/presentation/pages/catalogo_page.dart';
+import '../../game/domain/usecases/access_game_usecase.dart';
+import '../../game/domain/usecases/answer_puzzle_usecase.dart';
+import '../../game/domain/usecases/buy_trophy_usecase.dart';
+import '../../game/domain/usecases/cancel_game_usecase.dart';
+import '../../game/domain/usecases/create_game_usecase.dart';
+import '../../game/domain/usecases/get_game_state_usecase.dart';
+import '../../game/domain/usecases/play_card_usecase.dart';
+import '../../game/domain/usecases/ready_for_next_round_usecase.dart';
+import '../../game/domain/usecases/start_game_usecase.dart';
+import '../../lobby/presentation/controllers/lobby_controller.dart';
+import '../../lobby/presentation/pages/lobby_page.dart';
+import '../../game/presentation/controllers/game_controller.dart';
+import '../../game/presentation/pages/game_page.dart';
 
 /// Contêiner autenticado: desenha a dock e troca o corpo conforme a aba.
 ///
@@ -19,12 +32,30 @@ class HomePage extends StatefulWidget {
     required this.onLogout,
     required this.listCards,
     required this.getRanking,
+    required this.createGame,
+    required this.accessGame,
+    required this.getGameState,
+    required this.startGame,
+    required this.playCard,
+    required this.answerPuzzle,
+    required this.buyTrophy,
+    required this.ready,
+    required this.cancelGame,
   });
 
   final AuthSession session;
   final VoidCallback onLogout;
   final ListCardsUseCase listCards;
   final GetRankingUseCase getRanking;
+  final CreateGameUseCase createGame;
+  final AccessGameUseCase accessGame;
+  final GetGameStateUseCase getGameState;
+  final StartGameUseCase startGame;
+  final PlayCardUseCase playCard;
+  final AnswerPuzzleUseCase answerPuzzle;
+  final BuyTrophyUseCase buyTrophy;
+  final ReadyForNextRoundUseCase ready;
+  final CancelGameUseCase cancelGame;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -45,7 +76,12 @@ class _HomePageState extends State<HomePage> {
   /// tela consulte a API antes de ser aberta.
   final Set<int> _visited = {_Tab.home};
 
-  late final List<_DockTab> _tabs = [
+  late final LobbyController _lobbyController = LobbyController(
+    create: widget.createGame,
+    access: widget.accessGame,
+  );
+
+  List<_DockTab> get _tabs => [
     _DockTab(
       label: 'Home',
       icon: Icons.home_outlined,
@@ -56,11 +92,14 @@ class _HomePageState extends State<HomePage> {
         onSelectTab: _select,
       ),
     ),
-    const _DockTab(
+    _DockTab(
       label: 'Jogar',
       icon: Icons.play_circle_outline,
       selectedIcon: Icons.play_circle,
-      // TODO: builder: (_) => LobbyPage(...)
+      builder: (_) => LobbyPage(
+        controller: _lobbyController,
+        onGameReady: _openGame,
+      ),
     ),
     _DockTab(
       label: 'Catálogo',
@@ -85,12 +124,39 @@ class _HomePageState extends State<HomePage> {
     ),
   ];
 
+  void _openGame(game) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (_) => GamePage(
+          controller: GameController(
+            initial: game,
+            getState: widget.getGameState,
+            startGame: widget.startGame,
+            playCard: widget.playCard,
+            answerPuzzle: widget.answerPuzzle,
+            buyTrophy: widget.buyTrophy,
+            ready: widget.ready,
+            cancelGame: widget.cancelGame,
+          ),
+          myNickname: widget.session.user.nickname,
+          onExit: () => Navigator.of(context).pop(),
+        ),
+      ),
+    );
+  }
+
   void _select(int index) {
     if (index == _selected) return;
     setState(() {
       _selected = index;
       _visited.add(index);
     });
+  }
+
+  @override
+  void dispose() {
+    _lobbyController.dispose();
+    super.dispose();
   }
 
   @override
